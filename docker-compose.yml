@@ -1,0 +1,33 @@
+version: '3.1'
+
+services:
+  ffmpeg:
+    container_name: ffmpeg
+    image: jrottenberg/ffmpeg
+    restart: always
+    env_file:
+      - ".env"
+    networks:
+      - botnet
+
+  tgbot:
+    container_name: bot
+    build:
+      context: .
+    command: python app.py
+    networks:
+      - botnet
+    restart: always
+    env_file:
+      - ".env"
+    volumes:
+      - .:/src
+    # bot start after load db
+    depends_on:
+      - ffmpeg
+
+# указываются используемые сети
+networks:
+  botnet:
+    # указывается драйвер сети
+    driver: bridge
